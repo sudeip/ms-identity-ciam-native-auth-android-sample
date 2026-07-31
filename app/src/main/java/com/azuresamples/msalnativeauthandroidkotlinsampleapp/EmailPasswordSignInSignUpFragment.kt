@@ -19,11 +19,13 @@ import com.microsoft.identity.nativeauth.statemachine.errors.GetAccessTokenError
 import com.microsoft.identity.nativeauth.statemachine.errors.GetAccountError
 import com.microsoft.identity.nativeauth.statemachine.errors.SignInError
 import com.microsoft.identity.nativeauth.statemachine.errors.SignUpError
+import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccessTokenResult
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccountResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignInResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignUpResult
+import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
 import com.microsoft.identity.nativeauth.statemachine.states.SignUpCodeRequiredState
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +36,7 @@ import java.net.URL
 class EmailPasswordSignInSignUpFragment : Fragment(), NativeAuthRequestInterceptor {
 
     private lateinit var authClient: INativeAuthPublicClientApplication
+    private lateinit var authManager: AuthManager
     private var _binding: FragmentEmailPasswordBinding? = null
     private val binding get() = _binding!!
 
@@ -58,6 +61,7 @@ class EmailPasswordSignInSignUpFragment : Fragment(), NativeAuthRequestIntercept
         val view = binding.root
 
         authClient = AuthClient.getAuthClient()
+        authManager = AuthManager(authClient)
         (authClient as? PublicClientApplication)?.let { app ->
             (app.configuration as? NativeAuthPublicClientApplicationConfiguration)?.requestInterceptor = this
         }
@@ -114,6 +118,14 @@ class EmailPasswordSignInSignUpFragment : Fragment(), NativeAuthRequestIntercept
             val password = CharArray(binding.passwordText.length())
             binding.passwordText.text?.getChars(0, binding.passwordText.length(), password, 0)
 
+            if (Configuration.useNativeAuthV2) {
+                val result = authManager.signIn(email, password)
+                binding.passwordText.text?.clear()
+                password.fill('\u0000')
+                handleResultV2(result)
+                return@launch
+            }
+
             val parameters = NativeAuthSignInParameters(username = email)
             parameters.password = password
             val actionResult: SignInResult = authClient.signIn(parameters)
@@ -153,6 +165,14 @@ class EmailPasswordSignInSignUpFragment : Fragment(), NativeAuthRequestIntercept
             val email = binding.emailText.text.toString()
             val password = CharArray(binding.passwordText.length())
             binding.passwordText.text?.getChars(0, binding.passwordText.length(), password, 0)
+
+            if (Configuration.useNativeAuthV2) {
+                val result = authManager.signUp(email, password)
+                binding.passwordText.text?.clear()
+                password.fill('\u0000')
+                handleResultV2(result)
+                return@launch
+            }
 
             val parameters = NativeAuthSignUpParameters(username = email)
             parameters.password = password
@@ -247,6 +267,25 @@ class EmailPasswordSignInSignUpFragment : Fragment(), NativeAuthRequestIntercept
                 is GetAccessTokenError -> {
                     displayDialog(getString(R.string.msal_exception_title), accessTokenResult.exception?.message ?: accessTokenResult.errorMessage)
                 }
+            }
+        }
+    }
+
+    private fun handleResultV2(result: NativeAuthResultV2) {
+        when (result) {
+            is NativeAuthResultV2.Complete -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.sign_in_successful_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                displaySignedInState(accountState = result.resultValue)
+            }
+            is NativeAuthErrorV2 -> {
+                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+            }
+            else -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
         }
     }

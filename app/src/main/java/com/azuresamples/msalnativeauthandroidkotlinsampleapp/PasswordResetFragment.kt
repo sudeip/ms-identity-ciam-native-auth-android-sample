@@ -14,9 +14,11 @@ import com.microsoft.identity.nativeauth.parameters.NativeAuthResetPasswordParam
 import com.microsoft.identity.nativeauth.statemachine.errors.GetAccessTokenError
 import com.microsoft.identity.nativeauth.statemachine.errors.GetAccountError
 import com.microsoft.identity.nativeauth.statemachine.errors.ResetPasswordError
+import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccessTokenResult
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccountResult
 import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordStartResult
+import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordCodeRequiredState
@@ -26,6 +28,7 @@ import kotlinx.coroutines.launch
 
 class PasswordResetFragment : Fragment() {
     private lateinit var authClient: INativeAuthPublicClientApplication
+    private lateinit var authManager: AuthManager
     private var _binding: FragmentEmailSsprBinding? = null
     private val binding get() = _binding!!
 
@@ -39,6 +42,7 @@ class PasswordResetFragment : Fragment() {
         val view = binding.root
 
         authClient = AuthClient.getAuthClient()
+        authManager = AuthManager(authClient)
 
         init()
 
@@ -85,6 +89,11 @@ class PasswordResetFragment : Fragment() {
     private fun forgetPassword() {
         CoroutineScope(Dispatchers.Main).launch {
             val email = binding.emailText.text.toString()
+
+            if (Configuration.useNativeAuthV2) {
+                handleResultV2(authManager.resetPassword(email))
+                return@launch
+            }
 
             val parameter = NativeAuthResetPasswordParameters(username = email)
             val actionResult = authClient.resetPassword(parameter)
@@ -172,6 +181,20 @@ class PasswordResetFragment : Fragment() {
                 is GetAccessTokenError -> {
                     displayDialog(getString(R.string.msal_exception_title), accessTokenResult.exception?.message ?: accessTokenResult.errorMessage)
                 }
+            }
+        }
+    }
+
+    private fun handleResultV2(result: NativeAuthResultV2) {
+        when (result) {
+            is NativeAuthResultV2.Complete -> {
+                displaySignedInState(result.resultValue)
+            }
+            is NativeAuthErrorV2 -> {
+                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+            }
+            else -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
         }
     }

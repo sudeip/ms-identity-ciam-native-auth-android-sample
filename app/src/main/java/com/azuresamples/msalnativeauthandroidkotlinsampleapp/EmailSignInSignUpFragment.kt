@@ -16,11 +16,13 @@ import com.microsoft.identity.nativeauth.statemachine.errors.GetAccessTokenError
 import com.microsoft.identity.nativeauth.statemachine.errors.GetAccountError
 import com.microsoft.identity.nativeauth.statemachine.errors.SignInError
 import com.microsoft.identity.nativeauth.statemachine.errors.SignUpError
+import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccessTokenResult
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccountResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignInResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignUpResult
+import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
 import com.microsoft.identity.nativeauth.statemachine.states.SignInCodeRequiredState
 import com.microsoft.identity.nativeauth.statemachine.states.SignUpCodeRequiredState
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 
 class EmailSignInSignUpFragment : Fragment() {
     private lateinit var authClient: INativeAuthPublicClientApplication
+    private lateinit var authManager: AuthManager
     private var _binding: FragmentEmailSisuBinding? = null
     private val binding get() = _binding!!
 
@@ -43,6 +46,7 @@ class EmailSignInSignUpFragment : Fragment() {
         val view = binding.root
 
         authClient = AuthClient.getAuthClient()
+        authManager = AuthManager(authClient)
 
         init()
 
@@ -94,6 +98,11 @@ class EmailSignInSignUpFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             val email = binding.emailText.text.toString()
 
+            if (Configuration.useNativeAuthV2) {
+                handleResultV2(authManager.signIn(email))
+                return@launch
+            }
+
             val parameters = NativeAuthSignInParameters(username = email)
             val actionResult = authClient.signIn(parameters)
 
@@ -124,6 +133,11 @@ class EmailSignInSignUpFragment : Fragment() {
     private fun signUp() {
         CoroutineScope(Dispatchers.Main).launch {
             val email = binding.emailText.text.toString()
+
+            if (Configuration.useNativeAuthV2) {
+                handleResultV2(authManager.signUp(email))
+                return@launch
+            }
 
             val parameters = NativeAuthSignUpParameters(username = email)
             val actionResult = authClient.signUp(parameters)
@@ -161,6 +175,20 @@ class EmailSignInSignUpFragment : Fragment() {
                 } else {
                     displayDialog(getString(R.string.unexpected_sdk_result_title), signOutResult.toString())
                 }
+            }
+        }
+    }
+
+    private fun handleResultV2(result: NativeAuthResultV2) {
+        when (result) {
+            is NativeAuthResultV2.Complete -> {
+                displaySignedInState(result.resultValue)
+            }
+            is NativeAuthErrorV2 -> {
+                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+            }
+            else -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
         }
     }
