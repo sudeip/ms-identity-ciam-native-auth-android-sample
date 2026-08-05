@@ -2,6 +2,7 @@ package com.azuresamples.msalnativeauthandroidkotlinsampleapp
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordStart
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
+import com.microsoft.identity.nativeauth.statemachine.states.NativeAuthFlowStateV2
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordCodeRequiredState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -190,6 +192,9 @@ class PasswordResetFragment : Fragment() {
             is NativeAuthResultV2.Complete -> {
                 displaySignedInState(result.resultValue)
             }
+            is NativeAuthResultV2.CodeRequired -> {
+                navigateToResetPasswordCodeFragment(result.nextState)
+            }
             is NativeAuthErrorV2 -> {
                 displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
             }
@@ -220,8 +225,16 @@ class PasswordResetFragment : Fragment() {
     }
 
     private fun navigateToResetPasswordCodeFragment(nextState: ResetPasswordCodeRequiredState) {
+        navigateToResetPasswordCodeFragment(state = nextState)
+    }
+
+    private fun navigateToResetPasswordCodeFragment(nextState: NativeAuthFlowStateV2) {
+        navigateToResetPasswordCodeFragment(state = nextState)
+    }
+
+    private fun navigateToResetPasswordCodeFragment(state: Parcelable) {
         val bundle = Bundle()
-        bundle.putParcelable(Constants.STATE, nextState)
+        bundle.putParcelable(Constants.STATE, state)
         val fragment = PasswordResetCodeFragment()
         fragment.arguments = bundle
 
