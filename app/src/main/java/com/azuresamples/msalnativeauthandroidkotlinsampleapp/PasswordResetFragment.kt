@@ -2,7 +2,6 @@ package com.azuresamples.msalnativeauthandroidkotlinsampleapp
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,7 @@ import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordStart
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
-import com.microsoft.identity.nativeauth.statemachine.states.NativeAuthFlowStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.CodeRequiredStateV2
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordCodeRequiredState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,7 @@ class PasswordResetFragment : Fragment() {
         val view = binding.root
 
         authClient = AuthClient.getAuthClient()
-        authManager = AuthManager(authClient)
+        authManager = AuthClient.getAuthManager()
 
         init()
 
@@ -193,7 +192,7 @@ class PasswordResetFragment : Fragment() {
                 displaySignedInState(result.resultValue)
             }
             is NativeAuthResultV2.CodeRequired -> {
-                navigateToResetPasswordCodeFragment(result.nextState)
+                navigateToResetPasswordCodeFragmentV2(result.nextState)
             }
             is NativeAuthErrorV2 -> {
                 displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
@@ -225,16 +224,22 @@ class PasswordResetFragment : Fragment() {
     }
 
     private fun navigateToResetPasswordCodeFragment(nextState: ResetPasswordCodeRequiredState) {
-        navigateToResetPasswordCodeFragment(state = nextState)
-    }
-
-    private fun navigateToResetPasswordCodeFragment(nextState: NativeAuthFlowStateV2) {
-        navigateToResetPasswordCodeFragment(state = nextState)
-    }
-
-    private fun navigateToResetPasswordCodeFragment(state: Parcelable) {
         val bundle = Bundle()
-        bundle.putParcelable(Constants.STATE, state)
+        bundle.putParcelable(Constants.STATE, nextState)
+        val fragment = PasswordResetCodeFragment()
+        fragment.arguments = bundle
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .setReorderingAllowed(true)
+            .addToBackStack(fragment::class.java.name)
+            .replace(R.id.scenario_fragment, fragment)
+            .commit()
+    }
+
+    private fun navigateToResetPasswordCodeFragmentV2(nextState: CodeRequiredStateV2) {
+        val bundle = Bundle()
+        bundle.putParcelable(Constants.STATE, nextState)
         val fragment = PasswordResetCodeFragment()
         fragment.arguments = bundle
 
