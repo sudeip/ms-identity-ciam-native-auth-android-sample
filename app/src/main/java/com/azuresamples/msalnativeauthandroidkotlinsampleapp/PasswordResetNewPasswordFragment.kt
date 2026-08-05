@@ -16,8 +16,6 @@ import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordResul
 import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordSubmitPasswordResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignInResult
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordPasswordRequiredState
-import com.microsoft.identity.nativeauth.statemachine.states.NewPasswordRequiredStateV2
-import com.microsoft.identity.nativeauth.statemachine.states.SignInAfterResetPasswordStateV2
 import com.microsoft.identity.nativeauth.statemachine.states.SignInContinuationState
 import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
@@ -27,7 +25,7 @@ import kotlinx.coroutines.launch
 
 class PasswordResetNewPasswordFragment : Fragment() {
     private var currentState: ResetPasswordPasswordRequiredState? = null
-    private var currentStateV2: NewPasswordRequiredStateV2? = null
+    private lateinit var authManager: AuthManager
     private var _binding: FragmentPasswordBinding? = null
     private val binding get() = _binding!!
 
@@ -41,7 +39,7 @@ class PasswordResetNewPasswordFragment : Fragment() {
 
         val bundle = this.arguments
         if (Configuration.useNativeAuthV2) {
-            currentStateV2 = bundle?.getParcelable(Constants.STATE)
+            authManager = AuthClient.getAuthManager()
         } else {
             currentState = (bundle?.getParcelable(Constants.STATE) as? ResetPasswordPasswordRequiredState)!!
         }
@@ -96,7 +94,7 @@ class PasswordResetNewPasswordFragment : Fragment() {
     }
 
     private suspend fun resetPasswordV2(password: CharArray) {
-        when (val result = currentStateV2!!.submitNewPassword(password)) {
+        when (val result = authManager.submitNewPassword(password)) {
             is NativeAuthResultV2.Complete -> {
                 Toast.makeText(
                     requireContext(),
@@ -111,10 +109,13 @@ class PasswordResetNewPasswordFragment : Fragment() {
                     getString(R.string.password_reset_success_message),
                     Toast.LENGTH_LONG
                 ).show()
-                signInAfterPasswordResetV2(result.nextState)
+                signInAfterPasswordResetV2()
             }
             is NativeAuthErrorV2 -> {
                 displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+            }
+            null -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
             else -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
@@ -122,8 +123,8 @@ class PasswordResetNewPasswordFragment : Fragment() {
         }
     }
 
-    private suspend fun signInAfterPasswordResetV2(nextState: SignInAfterResetPasswordStateV2) {
-        when (val result = nextState.signIn()) {
+    private suspend fun signInAfterPasswordResetV2() {
+        when (val result = authManager.signInAfterPasswordReset()) {
             is NativeAuthResultV2.Complete -> {
                 Toast.makeText(
                     requireContext(),
@@ -134,6 +135,9 @@ class PasswordResetNewPasswordFragment : Fragment() {
             }
             is NativeAuthErrorV2 -> {
                 displayDialog(getString(R.string.msal_exception_title), result.errorMessage)
+            }
+            null -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
             else -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())

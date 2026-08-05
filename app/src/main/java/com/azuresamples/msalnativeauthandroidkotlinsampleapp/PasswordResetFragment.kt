@@ -43,7 +43,7 @@ class PasswordResetFragment : Fragment() {
         val view = binding.root
 
         authClient = AuthClient.getAuthClient()
-        authManager = AuthManager(authClient)
+        authManager = AuthClient.getAuthManager()
 
         init()
 
