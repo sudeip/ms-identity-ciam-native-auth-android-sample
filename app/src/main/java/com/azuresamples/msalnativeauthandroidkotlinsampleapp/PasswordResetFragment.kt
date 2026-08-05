@@ -21,6 +21,7 @@ import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordStart
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.results.SignOutResult
 import com.microsoft.identity.nativeauth.statemachine.states.AccountState
+import com.microsoft.identity.nativeauth.statemachine.states.CodeRequiredStateV2
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordCodeRequiredState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -190,6 +191,9 @@ class PasswordResetFragment : Fragment() {
             is NativeAuthResultV2.Complete -> {
                 displaySignedInState(result.resultValue)
             }
+            is NativeAuthResultV2.CodeRequired -> {
+                navigateToResetPasswordCodeFragmentV2(result.nextState)
+            }
             is NativeAuthErrorV2 -> {
                 displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
             }
@@ -220,6 +224,20 @@ class PasswordResetFragment : Fragment() {
     }
 
     private fun navigateToResetPasswordCodeFragment(nextState: ResetPasswordCodeRequiredState) {
+        val bundle = Bundle()
+        bundle.putParcelable(Constants.STATE, nextState)
+        val fragment = PasswordResetCodeFragment()
+        fragment.arguments = bundle
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .setReorderingAllowed(true)
+            .addToBackStack(fragment::class.java.name)
+            .replace(R.id.scenario_fragment, fragment)
+            .commit()
+    }
+
+    private fun navigateToResetPasswordCodeFragmentV2(nextState: CodeRequiredStateV2) {
         val bundle = Bundle()
         bundle.putParcelable(Constants.STATE, nextState)
         val fragment = PasswordResetCodeFragment()

@@ -7,7 +7,16 @@ import com.microsoft.identity.nativeauth.parameters.NativeAuthResetPasswordParam
 import com.microsoft.identity.nativeauth.parameters.NativeAuthSignInParameters
 import com.microsoft.identity.nativeauth.parameters.NativeAuthSignUpParameters
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
-import com.microsoft.identity.nativeauth.statemachine.states.NativeAuthFlowStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.AttributesInvalidStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.AttributesRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.CodeRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.MFARequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.MFAVerificationRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.NativeAuthBaseStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.NewPasswordRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.PasswordRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.StrongAuthRegistrationRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.StrongAuthVerificationRequiredStateV2
 
 /**
  * Facade over the Native Auth V2 SDK surface. Starts the V2 entry points, retains the state
@@ -15,7 +24,7 @@ import com.microsoft.identity.nativeauth.statemachine.states.NativeAuthFlowState
  */
 class AuthManager(private val application: INativeAuthPublicClientApplication) {
 
-    var currentState: NativeAuthFlowStateV2? = null
+    var currentState: NativeAuthBaseStateV2? = null
         private set
 
     suspend fun signIn(email: String, password: CharArray? = null): NativeAuthResultV2 {
@@ -36,25 +45,37 @@ class AuthManager(private val application: INativeAuthPublicClientApplication) {
     }
 
     suspend fun submitCode(code: String): NativeAuthResultV2? =
-        currentState?.let { track(it.submitCode(code)) }
-
-    suspend fun submitPassword(password: CharArray): NativeAuthResultV2? =
-        currentState?.let { track(it.submitPassword(password)) }
-
-    suspend fun submitNewPassword(password: CharArray): NativeAuthResultV2? =
-        currentState?.let { track(it.submitNewPassword(password)) }
-
-    suspend fun submitAttributes(attributes: UserAttributes): NativeAuthResultV2? =
-        currentState?.let { track(it.submitAttributes(attributes)) }
-
-    suspend fun selectAuthMethod(method: AuthMethod, verificationContact: String? = null): NativeAuthResultV2? =
-        currentState?.let { track(it.selectAuthMethod(method, verificationContact)) }
-
-    suspend fun submitChallenge(challenge: String): NativeAuthResultV2? =
-        currentState?.let { track(it.submitChallenge(challenge)) }
+        (currentState as? CodeRequiredStateV2)?.let { track(it.submitCode(code)) }
 
     suspend fun resendCode(): NativeAuthResultV2? =
-        currentState?.let { track(it.resendCode()) }
+        (currentState as? CodeRequiredStateV2)?.let { track(it.resendCode()) }
+
+    suspend fun submitPassword(password: CharArray): NativeAuthResultV2? =
+        (currentState as? PasswordRequiredStateV2)?.let { track(it.submitPassword(password)) }
+
+    suspend fun submitNewPassword(password: CharArray): NativeAuthResultV2? =
+        (currentState as? NewPasswordRequiredStateV2)?.let { track(it.submitNewPassword(password)) }
+
+    suspend fun submitAttributes(attributes: UserAttributes): NativeAuthResultV2? =
+        when (val state = currentState) {
+            is AttributesRequiredStateV2 -> track(state.submitAttributes(attributes))
+            is AttributesInvalidStateV2 -> track(state.submitAttributes(attributes))
+            else -> null
+        }
+
+    suspend fun selectAuthMethod(method: AuthMethod, verificationContact: String? = null): NativeAuthResultV2? =
+        when (val state = currentState) {
+            is MFARequiredStateV2 -> track(state.selectAuthMethod(method, verificationContact))
+            is StrongAuthRegistrationRequiredStateV2 -> track(state.selectAuthMethod(method, verificationContact))
+            else -> null
+        }
+
+    suspend fun submitChallenge(challenge: String): NativeAuthResultV2? =
+        when (val state = currentState) {
+            is MFAVerificationRequiredStateV2 -> track(state.submitChallenge(challenge))
+            is StrongAuthVerificationRequiredStateV2 -> track(state.submitChallenge(challenge))
+            else -> null
+        }
 
     private fun track(result: NativeAuthResultV2): NativeAuthResultV2 {
         currentState = when (result) {

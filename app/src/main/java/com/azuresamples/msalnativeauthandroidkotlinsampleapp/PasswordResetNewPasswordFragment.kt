@@ -16,13 +16,18 @@ import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordResul
 import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordSubmitPasswordResult
 import com.microsoft.identity.nativeauth.statemachine.results.SignInResult
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordPasswordRequiredState
+import com.microsoft.identity.nativeauth.statemachine.states.NewPasswordRequiredStateV2
+import com.microsoft.identity.nativeauth.statemachine.states.SignInAfterResetPasswordStateV2
 import com.microsoft.identity.nativeauth.statemachine.states.SignInContinuationState
+import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
+import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PasswordResetNewPasswordFragment : Fragment() {
-    private lateinit var currentState: ResetPasswordPasswordRequiredState
+    private var currentState: ResetPasswordPasswordRequiredState? = null
+    private var currentStateV2: NewPasswordRequiredStateV2? = null
     private var _binding: FragmentPasswordBinding? = null
     private val binding get() = _binding!!
 
@@ -35,7 +40,11 @@ class PasswordResetNewPasswordFragment : Fragment() {
         val view = binding.root
 
         val bundle = this.arguments
-        currentState = (bundle?.getParcelable(Constants.STATE) as? ResetPasswordPasswordRequiredState)!!
+        if (Configuration.useNativeAuthV2) {
+            currentStateV2 = bundle?.getParcelable(Constants.STATE)
+        } else {
+            currentState = (bundle?.getParcelable(Constants.STATE) as? ResetPasswordPasswordRequiredState)!!
+        }
 
         init()
 
@@ -57,7 +66,14 @@ class PasswordResetNewPasswordFragment : Fragment() {
             val password = CharArray(binding.passwordText.length())
             binding.passwordText.text?.getChars(0, binding.passwordText.length(), password, 0)
 
-            val actionResult: ResetPasswordSubmitPasswordResult = currentState.submitPassword(password)
+            if (Configuration.useNativeAuthV2) {
+                resetPasswordV2(password)
+                binding.passwordText.text?.clear()
+                password.fill('\u0000')
+                return@launch
+            }
+
+            val actionResult: ResetPasswordSubmitPasswordResult = currentState!!.submitPassword(password)
             binding.passwordText.text?.clear()
             password.fill('\u0000')
 
@@ -75,6 +91,52 @@ class PasswordResetNewPasswordFragment : Fragment() {
                 is ResetPasswordSubmitPasswordError -> {
                     handleError(actionResult)
                 }
+            }
+        }
+    }
+
+    private suspend fun resetPasswordV2(password: CharArray) {
+        when (val result = currentStateV2!!.submitNewPassword(password)) {
+            is NativeAuthResultV2.Complete -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.password_reset_success_message),
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+            is NativeAuthResultV2.SignInAfterResetPasswordRequired -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.password_reset_success_message),
+                    Toast.LENGTH_LONG
+                ).show()
+                signInAfterPasswordResetV2(result.nextState)
+            }
+            is NativeAuthErrorV2 -> {
+                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+            }
+            else -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
+            }
+        }
+    }
+
+    private suspend fun signInAfterPasswordResetV2(nextState: SignInAfterResetPasswordStateV2) {
+        when (val result = nextState.signIn()) {
+            is NativeAuthResultV2.Complete -> {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.sign_in_successful_message),
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+            is NativeAuthErrorV2 -> {
+                displayDialog(getString(R.string.msal_exception_title), result.errorMessage)
+            }
+            else -> {
+                displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
         }
     }
