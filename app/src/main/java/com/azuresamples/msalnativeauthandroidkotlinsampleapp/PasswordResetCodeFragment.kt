@@ -12,6 +12,7 @@ import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordCodeRe
 import com.microsoft.identity.nativeauth.statemachine.errors.ResendCodeError
 import com.microsoft.identity.nativeauth.statemachine.errors.SubmitCodeError
 import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
+import com.microsoft.identity.nativeauth.statemachine.errors.SubmitCodeErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordResendCodeResult
 import com.microsoft.identity.nativeauth.statemachine.results.ResetPasswordSubmitCodeResult
@@ -89,14 +90,41 @@ class PasswordResetCodeFragment : Fragment() {
             is NativeAuthResultV2.NewPasswordRequired -> {
                 navigateToNewPasswordFragmentV2()
             }
+            is SubmitCodeErrorV2 -> {
+                handleSubmitCodeErrorV2(result)
+            }
             is NativeAuthErrorV2 -> {
-                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+                handleGenericErrorV2(result)
             }
             null -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
             else -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
+            }
+        }
+    }
+
+    private fun handleSubmitCodeErrorV2(error: SubmitCodeErrorV2) {
+        when {
+            error.isBrowserRequired() || error.isInvalidCode() -> {
+                displayDialog(error.error, error.errorMessage)
+            }
+            else -> {
+                // Unexpected error
+                displayDialog(getString(R.string.unexpected_sdk_error_title), error.exception?.message ?: error.errorMessage)
+            }
+        }
+    }
+
+    private fun handleGenericErrorV2(error: NativeAuthErrorV2) {
+        when {
+            error.isNotImplemented() || error.isBrowserRequired() -> {
+                displayDialog(error.error ?: getString(R.string.unexpected_sdk_error_title), error.errorMessage)
+            }
+            else -> {
+                // Unexpected error
+                displayDialog(getString(R.string.unexpected_sdk_error_title), error.exception?.message ?: error.errorMessage)
             }
         }
     }

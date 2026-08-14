@@ -18,6 +18,7 @@ import com.microsoft.identity.nativeauth.statemachine.results.SignInResult
 import com.microsoft.identity.nativeauth.statemachine.states.ResetPasswordPasswordRequiredState
 import com.microsoft.identity.nativeauth.statemachine.states.SignInContinuationState
 import com.microsoft.identity.nativeauth.statemachine.errors.NativeAuthErrorV2
+import com.microsoft.identity.nativeauth.statemachine.errors.SubmitNewPasswordErrorV2
 import com.microsoft.identity.nativeauth.statemachine.results.NativeAuthResultV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -111,14 +112,41 @@ class PasswordResetNewPasswordFragment : Fragment() {
                 ).show()
                 signInAfterPasswordResetV2()
             }
+            is SubmitNewPasswordErrorV2 -> {
+                handleSubmitNewPasswordErrorV2(result)
+            }
             is NativeAuthErrorV2 -> {
-                displayDialog(result.error ?: getString(R.string.unexpected_sdk_error_title), result.errorMessage)
+                handleGenericErrorV2(result)
             }
             null -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
             }
             else -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
+            }
+        }
+    }
+
+    private fun handleSubmitNewPasswordErrorV2(error: SubmitNewPasswordErrorV2) {
+        when {
+            error.isInvalidPassword() || error.isPasswordResetFailed() || error.isBrowserRequired() -> {
+                displayDialog(error.error, error.errorMessage)
+            }
+            else -> {
+                // Unexpected error
+                displayDialog(getString(R.string.unexpected_sdk_error_title), error.exception?.message ?: error.errorMessage)
+            }
+        }
+    }
+
+    private fun handleGenericErrorV2(error: NativeAuthErrorV2) {
+        when {
+            error.isNotImplemented() || error.isBrowserRequired() -> {
+                displayDialog(error.error ?: getString(R.string.unexpected_sdk_error_title), error.errorMessage)
+            }
+            else -> {
+                // Unexpected error
+                displayDialog(getString(R.string.unexpected_sdk_error_title), error.exception?.message ?: error.errorMessage)
             }
         }
     }
@@ -134,7 +162,7 @@ class PasswordResetNewPasswordFragment : Fragment() {
                 finish()
             }
             is NativeAuthErrorV2 -> {
-                displayDialog(getString(R.string.msal_exception_title), result.errorMessage)
+                handleGenericErrorV2(result)
             }
             null -> {
                 displayDialog(getString(R.string.unexpected_sdk_result_title), result.toString())
