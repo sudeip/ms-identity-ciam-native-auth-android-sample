@@ -1,9 +1,10 @@
 {
-  "client_id": "Enter_the_Application_Id_Here",
+  "client_id": "3ec2f530-7116-4ffc-bf62-6e6a296e74f7",
+  "redirect_uri": "msauth://com.azuresamples.msalnativeauthandroidkotlinsampleapp/i4ICgP38Wtkg98Gt0K4TeNqbeC4%3D",
   "authorities": [
     {
       "type": "CIAM",
-      "authority_url": "https://bsc.ciamlogin.com/Enter_the_Tenant_Subdomain_Here.onmicrosoft.com/"
+      "authority_url": "https://bsccustomers.ciamlogin.com/bsccustomers.onmicrosoft.com/"
     }
   ],
   "challenge_types": ["oob", "password"],

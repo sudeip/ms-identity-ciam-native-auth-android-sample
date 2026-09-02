@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.azuresamples.msalnativeauthandroidkotlinsampleapp.databinding.FragmentCodeBinding
 import com.microsoft.identity.nativeauth.parameters.NativeAuthSignInContinuationParameters
@@ -33,6 +34,10 @@ class SignUpCodeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCodeBinding.inflate(inflater, container, false)
+
+        // Reached from LoginFragment's Join Banana Club flow, which hides the system action bar
+        // in favor of its own header - this screen has no header of its own, so bring it back.
+        (activity as? AppCompatActivity)?.supportActionBar?.show()
 
         val bundle = this.arguments
         currentState = (bundle?.getParcelable(Constants.STATE) as? SignUpCodeRequiredState)!!

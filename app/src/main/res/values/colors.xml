@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#47A5EA</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#47A5EA</color>
+    <!-- Banana Rental brand palette, matching the web app's Landing.css tokens. -->
+    <color name="brand_green_dark">#0B3D2C</color>
+    <color name="brand_green_darker">#062A1E</color>
+    <color name="brand_green">#0B6E4F</color>
+    <color name="brand_gold">#F2B705</color>
+    <color name="brand_cream">#F7F8F5</color>
+    <color name="brand_text">#1B2A22</color>
+
+    <color name="colorPrimary">@color/brand_green</color>
+    <color name="colorPrimaryDark">@color/brand_green_dark</color>
+    <color name="colorAccent">@color/brand_gold</color>
+
+    <!-- brand_gold at low alpha, for highlighting a claim row (e.g. "acrs") in the token tables. -->
+    <color name="claim_highlight_bg">#33F2B705</color>
 </resources>

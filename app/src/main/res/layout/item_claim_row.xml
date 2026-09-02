@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/dimens_10dp"
+    android:paddingBottom="@dimen/dimens_10dp"
+    android:paddingStart="@dimen/dimens_15dp"
+    android:paddingEnd="@dimen/dimens_15dp">
+
+    <TextView
+        android:id="@+id/claim_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/brand_green_dark"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/claim_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textIsSelectable="true"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/claim_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textSize="12sp"
+        android:textColor="#6B6B6B" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimens_1dp"
+        android:layout_marginTop="@dimen/dimens_10dp"
+        android:background="?android:attr/listDivider" />
+</LinearLayout>

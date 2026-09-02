@@ -80,4 +80,82 @@
 		android:background="?android:attr/listDivider"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/email_MFA" />
+
+	<!-- The following scenarios moved here from the bottom nav once Home/LoginFragment
+	     became the app's primary branded sign-in entry point. -->
+	<Button
+		android:id="@+id/email_oob_sisu"
+		android:layout_marginTop="@dimen/dimens_15dp"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/title_email_oob_sisu"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/divider4"
+		style="@style/OptionItemStyle" />
+
+	<View
+		android:id="@+id/divider5"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/dimens_1dp"
+		android:layout_marginLeft="@dimen/dimens_10dp"
+		android:background="?android:attr/listDivider"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/email_oob_sisu" />
+
+	<Button
+		android:id="@+id/email_password_sisu"
+		android:layout_marginTop="@dimen/dimens_15dp"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/title_email_password_sisu"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/divider5"
+		style="@style/OptionItemStyle" />
+
+	<View
+		android:id="@+id/divider6"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/dimens_1dp"
+		android:layout_marginLeft="@dimen/dimens_10dp"
+		android:background="?android:attr/listDivider"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/email_password_sisu" />
+
+	<Button
+		android:id="@+id/email_attribute_oob_sisu"
+		android:layout_marginTop="@dimen/dimens_15dp"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/title_email_attribute_oob_sisu"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/divider6"
+		style="@style/OptionItemStyle" />
+
+	<View
+		android:id="@+id/divider7"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/dimens_1dp"
+		android:layout_marginLeft="@dimen/dimens_10dp"
+		android:background="?android:attr/listDivider"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/email_attribute_oob_sisu" />
+
+	<Button
+		android:id="@+id/email_oob_sspr"
+		android:layout_marginTop="@dimen/dimens_15dp"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/title_email_oob_sspr"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/divider7"
+		style="@style/OptionItemStyle" />
+
+	<View
+		android:id="@+id/divider8"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/dimens_1dp"
+		android:layout_marginLeft="@dimen/dimens_10dp"
+		android:background="?android:attr/listDivider"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/email_oob_sspr" />
 </androidx.constraintlayout.widget.ConstraintLayout>

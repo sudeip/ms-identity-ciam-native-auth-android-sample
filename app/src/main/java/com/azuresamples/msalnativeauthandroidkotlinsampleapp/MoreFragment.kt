@@ -25,55 +25,20 @@ class MoreFragment : Fragment() {
     }
 
     private fun initializeButtonListener() {
-        binding.webFallback.setOnClickListener {
-            navigateToWebFallback()
-        }
+        binding.webFallback.setOnClickListener { navigateTo(WebFallbackFragment()) }
+        binding.idpWebFlow.setOnClickListener { navigateTo(IdPSignInSignUpWebFragment()) }
+        binding.useAccessToken.setOnClickListener { navigateTo(AccessApiFragment()) }
+        binding.emailMFA.setOnClickListener { navigateTo(MFAFragment()) }
 
-        binding.idpWebFlow.setOnClickListener {
-            navigateToIdPWebFlow()
-        }
-
-        binding.useAccessToken.setOnClickListener {
-            navigateToAccessApi()
-        }
-
-        binding.emailMFA.setOnClickListener {
-            navigateToMFA()
-        }
+        // Moved here from the bottom nav once Home/LoginFragment became the app's primary
+        // branded sign-in entry point - still the same scenario screens, unchanged.
+        binding.emailOobSisu.setOnClickListener { navigateTo(EmailSignInSignUpFragment()) }
+        binding.emailPasswordSisu.setOnClickListener { navigateTo(EmailPasswordSignInSignUpFragment()) }
+        binding.emailAttributeOobSisu.setOnClickListener { navigateTo(EmailAttributeSignUpFragment()) }
+        binding.emailOobSspr.setOnClickListener { navigateTo(PasswordResetFragment()) }
     }
 
-    private fun navigateToWebFallback() {
-        val fragment = WebFallbackFragment()
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .setReorderingAllowed(true)
-            .addToBackStack(fragment::class.java.name)
-            .replace(R.id.scenario_fragment, fragment)
-            .commit()
-    }
-
-    private fun navigateToIdPWebFlow() {
-        val fragment = IdPSignInSignUpWebFragment()
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .setReorderingAllowed(true)
-            .addToBackStack(fragment::class.java.name)
-            .replace(R.id.scenario_fragment, fragment)
-            .commit()
-    }
-
-    private fun navigateToAccessApi() {
-        val fragment = AccessApiFragment()
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .setReorderingAllowed(true)
-            .addToBackStack(fragment::class.java.name)
-            .replace(R.id.scenario_fragment, fragment)
-            .commit()
-    }
-
-    private fun navigateToMFA() {
-        val fragment = MFAFragment()
+    private fun navigateTo(fragment: Fragment) {
         requireActivity().supportFragmentManager
             .beginTransaction()
             .setReorderingAllowed(true)

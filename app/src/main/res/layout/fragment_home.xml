@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/brand_cream"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top bar: mirrors NavigationBar.jsx - logo + Sign In/Join or Sign out. -->
+        <LinearLayout
+            android:id="@+id/top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_green_dark"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dimens_15dp"
+            android:paddingTop="@dimen/dimens_10dp"
+            android:paddingEnd="@dimen/dimens_15dp"
+            android:paddingBottom="@dimen/dimens_10dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/logo_banana_rental"
+                android:contentDescription="@string/banana_logo_description" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/nav_sign_in_join_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_sign_in_join"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/nav_sign_out_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_out"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Showcases both sign-in demos this app ships side by side: the top bar button above
+             (native in-app) vs. the bottom nav's Profile tab (browser-based) - see MainActivity's
+             class doc for how the two are wired. -->
+        <TextView
+            android:id="@+id/auth_flow_showcase_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_cream"
+            android:gravity="center"
+            android:paddingStart="@dimen/dimens_15dp"
+            android:paddingTop="@dimen/dimens_5dp"
+            android:paddingEnd="@dimen/dimens_15dp"
+            android:paddingBottom="@dimen/dimens_5dp"
+            android:text="@string/auth_flow_showcase_note"
+            android:textColor="#6B6B6B"
+            android:textSize="11sp"
+            android:textStyle="italic" />
+
+        <!-- Hero: mirrors PageLayout.jsx's <header class="hero">. -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="220dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/hero_banana_rental"
+                android:contentDescription="@null" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_hero_scrim" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical"
+                android:padding="@dimen/dimens_20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hero_eyebrow"
+                    android:textColor="@color/brand_gold"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:text="@string/hero_title"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:text="@string/hero_subtitle"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Booking widget card: swaps between search / driver-details / confirmation,
+             mirroring SearchWidget.jsx -> ReservationSignup.jsx's local state machine. -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimens_15dp"
+            android:background="@drawable/bg_card_cream"
+            android:elevation="4dp"
+            android:padding="@dimen/dimens_20dp">
+
+            <!-- Search form -->
+            <LinearLayout
+                android:id="@+id/search_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_location_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_location_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:text="@string/search_location_default" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_pickup_date_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_pickup_date_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:focusable="false"
+                        android:cursorVisible="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search_return_date_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_return_date_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:focusable="false"
+                        android:cursorVisible="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/search_cars_button"
+                    style="@style/Widget.Banana.Button.GoldFilled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/search_cars_button" />
+            </LinearLayout>
+
+            <!-- Driver-details / reservation step -->
+            <LinearLayout
+                android:id="@+id/reservation_flow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/reservation_summary_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/dimens_15dp"
+                    android:lineSpacingExtra="4dp" />
+
+                <TextView
+                    style="@style/TitleTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/driver_details_title"
+                    android:textColor="@color/brand_text" />
+
+                <TextView
+                    android:id="@+id/driver_details_subhead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:text="@string/driver_details_subhead"
+                    android:textColor="#6B6B6B"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/driver_first_name_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/driver_first_name_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/driver_first_name_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/driver_last_name_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/driver_last_name_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/driver_last_name_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/driver_email_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/driver_email_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/driver_email_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:inputType="textEmailAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/driver_phone_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/driver_phone_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/driver_phone_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:inputType="phone" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:text="@string/driver_dob_label"
+                    android:textColor="@color/brand_text" />
+
+                <!-- Day/Month/Year spinners, same as the web app's DAYS/MONTHS/YEARS <select>
+                     dropdowns (dobUtils.js) - picking a year from a full list beats paging a
+                     calendar widget back one month at a time to reach, say, 1980. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_10dp"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <Spinner
+                        android:id="@+id/driver_dob_day_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <Spinner
+                        android:id="@+id/driver_dob_month_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimens_5dp"
+                        android:layout_weight="1" />
+
+                    <Spinner
+                        android:id="@+id/driver_dob_year_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimens_5dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/driver_dob_error_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:layout_marginBottom="@dimen/dimens_10dp"
+                    android:textColor="#B3261E"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <!-- Signed-out actions -->
+                <LinearLayout
+                    android:id="@+id/signed_out_actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/loyalty_optin_question"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/dimens_10dp"
+                        android:text="@string/loyalty_optin_subtext"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/continue_as_guest_button"
+                        style="@style/Widget.Banana.Button.GoldOutline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/continue_as_guest_button" />
+
+                    <Button
+                        android:id="@+id/yes_sign_me_up_button"
+                        style="@style/Widget.Banana.Button.GoldFilled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimens_10dp"
+                        android:text="@string/yes_sign_me_up_button" />
+
+                    <Button
+                        android:id="@+id/login_button"
+                        style="@style/Widget.Banana.Button.GoldOutline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimens_10dp"
+                        android:text="@string/login_button" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimens_5dp"
+                        android:gravity="center"
+                        android:text="@string/loyalty_optin_login_note"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Signed-in action -->
+                <Button
+                    android:id="@+id/reserve_now_button"
+                    style="@style/Widget.Banana.Button.GoldFilled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:text="@string/reserve_now_button"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Confirmation step -->
+            <LinearLayout
+                android:id="@+id/confirmation_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✓"
+                    android:textColor="@color/brand_green"
+                    android:textSize="40sp" />
+
+                <TextView
+                    style="@style/TitleTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:text="@string/reservation_confirmed_title"
+                    android:textColor="@color/brand_text" />
+
+                <TextView
+                    android:id="@+id/reservation_confirmed_thanks_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:gravity="center"
+                    android:text="@string/reservation_confirmed_demo_note"
+                    android:textSize="12sp"
+                    android:textStyle="italic" />
+
+                <Button
+                    android:id="@+id/continue_to_my_account_button"
+                    style="@style/Widget.Banana.Button.GoldFilled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_15dp"
+                    android:text="@string/continue_to_my_account_button"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Dashboard: mirrors MainContent in App.jsx - only shown once signed in. -->
+        <LinearLayout
+            android:id="@+id/dashboard_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimens_15dp"
+            android:background="@drawable/bg_card_cream"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:padding="@dimen/dimens_20dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/profile_summary_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="4dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimens_1dp"
+                android:layout_marginTop="@dimen/dimens_15dp"
+                android:layout_marginBottom="@dimen/dimens_15dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:id="@+id/drivers_license_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/access_sensitive_feature_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_10dp"
+                android:text="@string/access_sensitive_feature_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5dp"
+                android:text="@string/sensitive_feature_demo_note"
+                android:textSize="11sp"
+                android:textStyle="italic" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/token_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_20dp"
+                app:tabIndicatorColor="@color/brand_green"
+                app:tabSelectedTextColor="@color/brand_green_dark"
+                app:tabTextColor="@color/brand_text">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/id_token_tab" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/access_token_tab" />
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/claims_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_10dp"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/footer_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dimens_15dp"
+            android:gravity="center"
+            android:text="@string/footer_copyright"
+            android:textSize="12sp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

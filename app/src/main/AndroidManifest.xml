@@ -35,7 +35,7 @@
 
                 <data
                     android:host="com.azuresamples.msalnativeauthandroidkotlinsampleapp"
-                    android:path="/ENTER_YOUR_SIGNATURE_HASH_HERE"
+                    android:path="/i4ICgP38Wtkg98Gt0K4TeNqbeC4="
                     android:scheme="msauth" />
             </intent-filter>
         </activity>

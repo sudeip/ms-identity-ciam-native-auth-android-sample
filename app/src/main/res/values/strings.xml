@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_title">Native Authentication Sample</string>
-    <string name="app_name">Native Authentication Sample</string>
+    <string name="app_title">Banana Rental</string>
+    <string name="app_name">Banana Rental</string>
 
     <!-- Title -->
     <string name="title_email_password_sisu">"Email &amp; Password"</string>
@@ -87,4 +87,98 @@
 
     <!-- Image descriptions -->
     <string name="chevron_description">"Chevron right"</string>
+
+    <!-- Banana Rental branding: Home screen -->
+    <string name="title_home">"Home"</string>
+    <string name="title_profile">"Profile"</string>
+    <string name="auth_flow_showcase_note">"Demo note: \'Sign In / Join\' above uses native in-app auth; the Profile tab below uses browser-based auth instead (and leaves an SSO session that step-up MFA can reuse)."</string>
+    <string name="banana_logo_description">"Banana Rental"</string>
+    <string name="nav_sign_in_join">"Sign In / Join Banana Club"</string>
+    <string name="hero_eyebrow">"Banana Rental"</string>
+    <string name="hero_title">"Find your perfect ride, anywhere."</string>
+    <string name="hero_subtitle">"Fast, affordable car rentals in 500+ cities. Book in minutes, drive in style."</string>
+    <string name="search_location_label">"Pick-up &amp; return location"</string>
+    <string name="search_location_default">"Los Angeles, CA (LAX)"</string>
+    <string name="search_pickup_date_label">"Pick-up date"</string>
+    <string name="search_return_date_label">"Return date"</string>
+    <string name="search_cars_button">"Search Cars"</string>
+
+    <string name="reservation_title">"Your Reservation"</string>
+    <string name="reservation_vehicle_name">"Toyota RAV4 or similar"</string>
+    <string name="reservation_vehicle_class">"Midsize SUV"</string>
+    <string name="reservation_extras">"GPS Navigation, Additional Driver"</string>
+    <string name="reservation_pickup_label">"Pick-up"</string>
+    <string name="reservation_return_label">"Return"</string>
+    <string name="reservation_extras_label">"Extras"</string>
+    <string name="reservation_total_format">"%1$d day(s) × $%2$d"</string>
+    <string name="reservation_total_estimated_format">"$%1$d estimated"</string>
+
+    <string name="driver_details_title">"Driver Details"</string>
+    <string name="driver_details_subhead">"This demo doesn\'t have real vehicle selection or add-ons - imagine you already picked those."</string>
+    <string name="driver_details_prefill_note">"We\'ve filled in your name and email from your Banana Club account - they\'re locked since they\'re already verified."</string>
+    <string name="driver_first_name_label">"First name"</string>
+    <string name="driver_last_name_label">"Last name"</string>
+    <string name="driver_email_label">"Email"</string>
+    <string name="driver_phone_label">"Phone (Optional)"</string>
+    <string name="driver_dob_label">"Date of birth"</string>
+    <string name="reservation_step_location_dates">"Location &amp; Dates"</string>
+    <string name="reservation_step_vehicle">"Vehicle"</string>
+    <string name="reservation_step_extras">"Extras"</string>
+    <string name="reservation_step_driver_details">"Driver Details"</string>
+
+    <string name="loyalty_optin_question">"Want to earn points on this trip?"</string>
+    <string name="loyalty_optin_subtext">"Join Banana Club free - we\'ll save these details and get you signed up in seconds. You\'ll only need to set a password."</string>
+    <string name="continue_as_guest_button">"Continue as Guest"</string>
+    <string name="yes_sign_me_up_button">"Yes, Sign Me Up"</string>
+    <string name="login_button">"Login"</string>
+    <string name="loyalty_optin_login_note">"Already a member? Login instead - no need to fill out the form above."</string>
+    <string name="reserve_now_button">"Reserve Now"</string>
+
+    <string name="reservation_confirmed_title">"Your car is reserved!"</string>
+    <string name="reservation_confirmed_thanks_format">"Thanks, %1$s - a confirmation would normally be sent to %2$s."</string>
+    <string name="reservation_confirmed_demo_note">"Demo note: this app only wires up sign-in/sign-up - there\'s no real booking backend behind this confirmation."</string>
+    <string name="continue_to_my_account_button">"Continue to My Account"</string>
+
+    <string name="profile_name_label">"Name:"</string>
+    <string name="profile_phone_label">"Phone:"</string>
+    <string name="profile_dob_label">"Date of Birth:"</string>
+    <string name="drivers_license_label">"Driver\'s License:"</string>
+    <string name="drivers_license_masked">"••••••••••"</string>
+    <string name="drivers_license_demo_value">"DL8773233198"</string>
+    <string name="access_sensitive_feature_button">"Access Sensitive Feature (Require MFA)"</string>
+    <string name="sensitive_data_now_visible_button">"Sensitive Data now Visible"</string>
+    <string name="sensitive_feature_demo_note">"Requests an \'acrs\' Authentication Context claim on the access token. If your tenant\'s Conditional Access policy requires MFA for it, you\'ll be prompted in a browser popup to complete it."</string>
+    <string name="step_up_not_satisfied_message">"Step-up completed, but the acrs claim wasn\'t satisfied - check that your Conditional Access policy is scoped to this app and the Authentication Context ID matches."</string>
+
+    <string name="id_token_tab">"ID Token"</string>
+    <string name="access_token_tab">"Access Token"</string>
+    <string name="claims_table_claim_header">"Claim"</string>
+    <string name="claims_table_value_header">"Value"</string>
+    <string name="claims_table_description_header">"Description"</string>
+
+    <string name="footer_copyright">"© 2026 Banana Rental. All rights reserved."</string>
+
+    <!-- Banana Rental branding: Login screen -->
+    <string name="login_sign_in_button">"Sign In"</string>
+    <string name="login_join_button">"Join Banana Club"</string>
+
+    <!-- Banana Rental branding: Join Banana Club profile step (before email/password) -->
+    <string name="join_profile_note">"You\'ll set your email and create a password next."</string>
+    <string name="profile_first_name_label">"First Name *"</string>
+    <string name="profile_last_name_label">"Last Name *"</string>
+    <string name="profile_preferred_name_label">"Preferred Name (Optional)"</string>
+    <string name="join_profile_dob_label">"Date of birth *"</string>
+    <string name="join_profile_phone_label">"Phone Number *"</string>
+    <string name="profile_phone_consent_note">"No country code? We\'ll default to +1 (US). By providing your number, you agree to receive text messages. Message and data rates may apply."</string>
+    <string name="profile_terms_label">"I\'ve read terms and conditions *"</string>
+    <string name="profile_continue_button">"Continue to Create Account"</string>
+    <string name="profile_cancel_button">"Cancel"</string>
+    <string name="first_name_required_message">"First name is required."</string>
+    <string name="last_name_required_message">"Last name is required."</string>
+    <string name="terms_required_message">"Please accept the terms and conditions."</string>
+    <string name="dob_required_message">"Date of birth is required."</string>
+    <string name="minimum_age_message">"You must be at least %1$d years old."</string>
+    <string name="minimum_age_rental_message">"You must be at least %1$d years old to rent a car."</string>
+    <string name="invalid_phone_message">"Enter a valid phone number."</string>
+    <string name="invalid_email_message">"Enter a valid email address."</string>
 </resources>

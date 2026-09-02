@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NestedScrollView (not a plain ScrollView) so drag-to-expand/scroll works correctly when
+     this is hosted in a BottomSheetDialogFragment (see LoginFragment). -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/brand_cream"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Slim header, same as HomeFragment's top_bar: logo left, Sign In / Join Banana
+             Club right - the two choices this whole screen exists to offer, always visible,
+             instead of a tall centered logo banner with the choices stacked far below it. -->
+        <LinearLayout
+            android:id="@+id/login_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/brand_green_dark"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dimens_15dp"
+            android:paddingTop="@dimen/dimens_10dp"
+            android:paddingEnd="@dimen/dimens_15dp"
+            android:paddingBottom="@dimen/dimens_10dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/logo_banana_rental"
+                android:contentDescription="@string/banana_logo_description" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/sign_in_mode_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/login_sign_in_button"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/join_mode_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dimens_10dp"
+                android:text="@string/login_join_button"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dimens_30dp">
+
+            <!-- Join Banana Club profile step: mirrors ProfileCompletion.jsx's preAuth mode -
+                 collect the loyalty profile first, email/password comes next (unlike the web app,
+                 which redirects to Entra's hosted page for that - native auth collects it in-app). -->
+            <LinearLayout
+                android:id="@+id/profile_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    style="@style/TitleTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_join_button"
+                    android:textColor="@color/brand_text" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:layout_marginBottom="@dimen/dimens_10dp"
+                    android:text="@string/join_profile_note"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profile_first_name_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/profile_first_name_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profile_first_name_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profile_last_name_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/profile_last_name_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profile_last_name_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/profile_preferred_name_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profile_preferred_name_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:text="@string/join_profile_dob_label"
+                    android:textColor="@color/brand_text" />
+
+                <!-- Day/Month/Year spinners, same as the web app's DAYS/MONTHS/YEARS <select>
+                     dropdowns (dobUtils.js) - picking a year from a full list beats paging a
+                     calendar widget back one month at a time to reach, say, 1980. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_10dp"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <Spinner
+                        android:id="@+id/profile_dob_day_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <Spinner
+                        android:id="@+id/profile_dob_month_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimens_5dp"
+                        android:layout_weight="1" />
+
+                    <Spinner
+                        android:id="@+id/profile_dob_year_spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimens_5dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/profile_dob_error_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginTop="@dimen/dimens_5dp"
+                    android:layout_marginBottom="@dimen/dimens_10dp"
+                    android:textColor="#B3261E"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/profile_phone_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/join_profile_phone_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/profile_phone_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:inputType="phone" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginEnd="@dimen/dimens_15dp"
+                    android:text="@string/profile_phone_consent_note"
+                    android:textSize="11sp" />
+
+                <CheckBox
+                    android:id="@+id/profile_terms_checkbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginEnd="@dimen/dimens_15dp"
+                    android:text="@string/profile_terms_label" />
+
+                <Button
+                    android:id="@+id/profile_continue_button"
+                    style="@style/Widget.Banana.Button.GoldFilled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_15dp"
+                    android:text="@string/profile_continue_button" />
+
+                <Button
+                    android:id="@+id/profile_cancel_button"
+                    style="@style/Widget.Banana.Button.GoldOutline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimens_10dp"
+                    android:text="@string/profile_cancel_button" />
+            </LinearLayout>
+
+            <!-- Email + password form, revealed once Sign In is picked, or once the profile step
+                 above is completed for Join Banana Club. Reuses the same SDK sign-in/sign-up calls
+                 as EmailPasswordSignInSignUpFragment. -->
+            <LinearLayout
+                android:id="@+id/form_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/profile_section">
+
+                <TextView
+                    android:id="@+id/form_title"
+                    style="@style/TitleTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/brand_text" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/email_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/attribute_email_or_username">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:inputType="textEmailAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/password_layout"
+                    style="@style/TextInputLayoutStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/attribute_password"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password_text"
+                        style="@style/TextInputEditTextStyle"
+                        android:layout_width="match_parent"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/submit_button"
+                    style="@style/Widget.Banana.Button.GoldFilled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dimens_15dp"
+                    android:layout_marginEnd="@dimen/dimens_15dp" />
+
+                <TextView
+                    android:id="@+id/switch_mode_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/dimens_15dp"
+                    android:padding="@dimen/dimens_10dp"
+                    android:textColor="@color/brand_green"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

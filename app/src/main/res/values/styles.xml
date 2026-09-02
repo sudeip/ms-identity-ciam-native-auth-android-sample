@@ -51,4 +51,27 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- Banana Rental brand button styles, mirroring .btn-outline-gold / .joinButton. -->
+    <style name="Widget.Banana.Button.GoldOutline" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/bg_pill_gold_outline</item>
+        <item name="android:textColor">@color/brand_gold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingStart">@dimen/dimens_20dp</item>
+        <item name="android:paddingEnd">@dimen/dimens_20dp</item>
+        <item name="android:paddingTop">@dimen/dimens_10dp</item>
+        <item name="android:paddingBottom">@dimen/dimens_10dp</item>
+    </style>
+
+    <style name="Widget.Banana.Button.GoldFilled" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/bg_pill_gold_filled</item>
+        <item name="android:textColor">@color/brand_green_dark</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingStart">@dimen/dimens_20dp</item>
+        <item name="android:paddingEnd">@dimen/dimens_20dp</item>
+        <item name="android:paddingTop">@dimen/dimens_10dp</item>
+        <item name="android:paddingBottom">@dimen/dimens_10dp</item>
+    </style>
+
 </resources>
