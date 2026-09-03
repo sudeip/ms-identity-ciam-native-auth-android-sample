@@ -17,6 +17,8 @@
     <string name="sign_in">"Sign In"</string>
     <string name="sign_up">"Sign Up"</string>
     <string name="sign_out">"Sign Out"</string>
+    <string name="browser_sign_out_button">"Sign Out of Browser Session"</string>
+    <string name="browser_sign_out_note">"\'Sign Out\' above only clears this app\'s cache. Use this to also clear the SSO session Entra keeps in the browser, so the next browser-based sign-in (Profile tab, or the MFA step-up above) asks fresh instead of reusing it."</string>
     <string name="forget_password">"Forget Password"</string>
     <string name="submit_password">"Submit"</string>
     <string name="create">"Create New User"</string>

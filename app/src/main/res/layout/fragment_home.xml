@@ -456,6 +456,22 @@
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="4dp" />
 
+            <Button
+                android:id="@+id/browser_sign_out_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_10dp"
+                android:text="@string/browser_sign_out_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5dp"
+                android:text="@string/browser_sign_out_note"
+                android:textSize="11sp"
+                android:textStyle="italic" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dimens_1dp"

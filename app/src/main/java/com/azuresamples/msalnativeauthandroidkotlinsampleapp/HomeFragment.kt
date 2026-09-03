@@ -2,6 +2,7 @@ package com.azuresamples.msalnativeauthandroidkotlinsampleapp
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -116,6 +118,7 @@ class HomeFragment : Fragment() {
     private fun initializeListeners() {
         binding.navSignInJoinButton.setOnClickListener { navigateToLogin(null) }
         binding.navSignOutButton.setOnClickListener { signOut() }
+        binding.browserSignOutButton.setOnClickListener { browserSignOut() }
 
         binding.searchPickupDateText.setOnClickListener {
             pickDate(pickupDateMillis) { millis ->
@@ -322,6 +325,13 @@ class HomeFragment : Fragment() {
         return claimsRequest
     }
 
+    /** email/preferred_username off the ID token, used as login_hint so the step-up's browser
+     *  call doesn't have to show an account picker to know which account to continue. */
+    private fun currentAccountEmail(): String =
+        idTokenClaims.firstOrNull { it.claim == "email" }?.value
+            ?: idTokenClaims.firstOrNull { it.claim == "preferred_username" }?.value
+            ?: ""
+
     private fun startInteractiveStepUp() {
         authClient.acquireToken(
             AcquireTokenParameters(
@@ -336,6 +346,14 @@ class HomeFragment : Fragment() {
                     // getAccessToken() call wouldn't find this token and would re-challenge MFA.
                     .withScopes(mutableListOf("openid", "offline_access", "profile"))
                     .withClaims(buildStepUpClaimsRequest())
+                    // Prompt.LOGIN would skip Entra's account picker too, but it also forces a full
+                    // credential re-entry - defeating the point of step-up, which should feel like
+                    // "just the MFA challenge" on top of the session that's already signed in.
+                    // login_hint disambiguates the account instead, so there's nothing to pick:
+                    // Entra reuses the existing SSO session silently and goes straight to whatever
+                    // Conditional Access still needs (the SMS/OTP prompt), with no picker and no
+                    // re-typed password.
+                    .withLoginHint(currentAccountEmail())
                     .withCallback(object : AuthenticationCallback {
                         override fun onSuccess(authenticationResult: IAuthenticationResult) {
                             applyStepUpResult(authenticationResult.accessToken)
@@ -386,6 +404,24 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    /**
+     * Native signOut() above only clears MSAL's local token cache - it never touches the
+     * browser's own Entra session cookie, which MainActivity's Profile flow (and step-up's
+     * login_hint call) establish/reuse via Custom Tabs. That cookie is what lets those flows feel
+     * seamless, so it's intentionally left alone by the native sign-out above; this is a separate,
+     * explicit action for clearing it - hitting the v2.0 logout endpoint in a Custom Tab, the same
+     * way a website's own "log out" link would.
+     */
+    private fun browserSignOut() {
+        val authority = AuthClient.authorityUrl?.trimEnd('/') ?: return
+        // logout_hint tells Entra which session to end, so it skips its own "which account do you
+        // want to sign out" picker - same idea as login_hint on the sign-in side. Fine to assume a
+        // single account here (see currentAccountEmail's caller); with more than one signed in on
+        // the device, this would need to loop over them or drop the hint and accept the picker.
+        val logoutUrl = "$authority/oauth2/v2.0/logout?logout_hint=${Uri.encode(currentAccountEmail())}"
+        CustomTabsIntent.Builder().build().launchUrl(requireContext(), Uri.parse(logoutUrl))
     }
 
     // --- Booking widget state: search -> driver details -> confirmation ---

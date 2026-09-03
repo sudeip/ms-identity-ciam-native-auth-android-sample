@@ -9,6 +9,7 @@ import com.azuresamples.msalnativeauthandroidkotlinsampleapp.databinding.Activit
 import com.microsoft.identity.client.AcquireTokenParameters
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.IAuthenticationResult
+import com.microsoft.identity.client.Prompt
 import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.nativeauth.INativeAuthPublicClientApplication
 import com.microsoft.identity.nativeauth.statemachine.results.GetAccountResult
@@ -24,7 +25,8 @@ import kotlinx.coroutines.launch
  * - This bottom nav's "Profile" entry -> straight to the system browser (see openProfile):
  *   classic redirect-based sign-in, same mechanism as More -> Web Fallback. Going through the
  *   browser here (rather than native) is also what lets HomeFragment's step-up MFA demo reuse an
- *   SSO session instead of forcing a fresh login on top of the MFA prompt.
+ *   SSO session (via login_hint, not the account picker) instead of forcing a fresh login on top
+ *   of the MFA prompt.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -79,7 +81,8 @@ class MainActivity : AppCompatActivity() {
      * Goes straight to the system browser for sign-in - no in-app email/password fields, unlike
      * LoginFragment - so the browser's hosted UI collects credentials/MFA itself. Same call shape
      * as WebFallbackFragment's browser-required fallback, just entered directly instead of after a
-     * failed native attempt.
+     * failed native attempt. Forces Prompt.LOGIN so it always lands on the credential form instead
+     * of Entra's account picker.
      */
     private fun signInWithBrowser(home: HomeFragment) {
         authClient.acquireToken(
@@ -87,6 +90,14 @@ class MainActivity : AppCompatActivity() {
                 AcquireTokenParameters.Builder()
                     .startAuthorizationFromActivity(this)
                     .withScopes(mutableListOf("openid", "profile", "email"))
+                    // Without this, MSAL defaults to Prompt.WHEN_REQUIRED, which shows Entra's
+                    // account picker whenever the browser already has SSO state - forcing LOGIN
+                    // skips the picker and goes straight to the sign-in form. This is the very
+                    // first sign-in for this account (openProfile only calls here when signed
+                    // out), so there's no existing session to preserve - unlike HomeFragment's
+                    // step-up call, which uses login_hint instead so it can keep reusing the
+                    // session this call establishes.
+                    .withPrompt(Prompt.LOGIN)
                     .withCallback(object : AuthenticationCallback {
                         override fun onSuccess(authenticationResult: IAuthenticationResult) {
                             Toast.makeText(this@MainActivity, getString(R.string.sign_in_successful_message), Toast.LENGTH_SHORT).show()

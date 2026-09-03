@@ -14,6 +14,7 @@ import com.microsoft.identity.client.AcquireTokenParameters
 import com.microsoft.identity.client.AuthenticationCallback
 import com.microsoft.identity.client.IAccount
 import com.microsoft.identity.client.IAuthenticationResult
+import com.microsoft.identity.client.Prompt
 import com.microsoft.identity.client.exception.MsalException
 import com.microsoft.identity.nativeauth.INativeAuthPublicClientApplication
 import com.microsoft.identity.nativeauth.parameters.NativeAuthSignInParameters
@@ -106,6 +107,10 @@ class WebFallbackFragment : Fragment() {
                         AcquireTokenParameters.Builder()
                             .startAuthorizationFromActivity(requireActivity())
                             .withScopes(mutableListOf("profile", "openid", "email"))
+                            // Without this, MSAL defaults to Prompt.WHEN_REQUIRED, which shows
+                            // Entra's account picker whenever the browser already has SSO state -
+                            // forcing LOGIN skips the picker and goes straight to the sign-in form.
+                            .withPrompt(Prompt.LOGIN)
                             .withCallback(getAuthInteractiveCallback())
                     )
                 )
