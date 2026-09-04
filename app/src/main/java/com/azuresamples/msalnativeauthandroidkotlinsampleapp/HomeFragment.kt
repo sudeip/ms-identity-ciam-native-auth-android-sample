@@ -2,8 +2,10 @@ package com.azuresamples.msalnativeauthandroidkotlinsampleapp
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -145,6 +147,7 @@ class HomeFragment : Fragment() {
         binding.continueToMyAccountButton.setOnClickListener { showSearchForm() }
 
         binding.accessSensitiveFeatureButton.setOnClickListener { requestStepUp() }
+        binding.accessSensitiveFeatureNativeOnlyButton.setOnClickListener { requestStepUpNativeOnly() }
 
         binding.tokenTabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -304,6 +307,41 @@ class HomeFragment : Fragment() {
     }
 
     /**
+     * Same acrs request as requestStepUp(), but deliberately skips the browser fallback -
+     * demonstrates *why* that fallback exists: native auth's own APIs have no UI to satisfy an
+     * interactive Conditional Access challenge (MFA, step-up registration, etc.), so a policy
+     * that needs one always surfaces as an error here instead of a browser-completed token.
+     */
+    private fun requestStepUpNativeOnly() {
+        val accountState = currentAccountState ?: return
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val parameters = NativeAuthGetAccessTokenParameters().apply {
+                claimsRequest = buildStepUpClaimsRequest()
+            }
+
+            when (val result = accountState.getAccessToken(parameters)) {
+                is GetAccessTokenResult.Complete -> {
+                    // Conditional Access didn't need interaction this time (already satisfied via
+                    // an existing SSO session, or not configured for this account) - nothing for
+                    // native auth to fail on, so there's no error to show.
+                    applyStepUpResult(result.resultValue.accessToken)
+                    Toast.makeText(requireContext(), R.string.native_step_up_not_challenged_message, Toast.LENGTH_LONG).show()
+                }
+                is GetAccessTokenError -> {
+                    val rawError = result.exception?.message ?: result.errorMessage
+                    val message = if (result.isBrowserRequired() || requiresInteractiveStepUp(result)) {
+                        getString(R.string.native_step_up_requires_browser_message, rawError)
+                    } else {
+                        rawError
+                    }
+                    displayDialog(getString(R.string.native_step_up_error_title), message)
+                }
+            }
+        }
+    }
+
+    /**
      * isBrowserRequired() reads a native-auth-specific errorType field, but this step-up call is a
      * silent token refresh under the hood (AcquireTokenSilent), not a native-auth API call - so a
      * Conditional Access rejection here comes back as a generic ServiceException whose errorType is
@@ -415,13 +453,36 @@ class HomeFragment : Fragment() {
      * way a website's own "log out" link would.
      */
     private fun browserSignOut() {
-        val authority = AuthClient.authorityUrl?.trimEnd('/') ?: return
+        val authority = AuthClient.authorityUrl?.trimEnd('/')
+        if (authority == null) {
+            displayDialog(getString(R.string.msal_exception_title), getString(R.string.browser_sign_out_no_authority_message))
+            return
+        }
+
         // logout_hint tells Entra which session to end, so it skips its own "which account do you
         // want to sign out" picker - same idea as login_hint on the sign-in side. Fine to assume a
         // single account here (see currentAccountEmail's caller); with more than one signed in on
         // the device, this would need to loop over them or drop the hint and accept the picker.
-        val logoutUrl = "$authority/oauth2/v2.0/logout?logout_hint=${Uri.encode(currentAccountEmail())}"
-        CustomTabsIntent.Builder().build().launchUrl(requireContext(), Uri.parse(logoutUrl))
+        // Only attach it when there's an actual value - an empty logout_hint param confuses some
+        // tenants into showing an error page instead of just falling back to the picker.
+        val hint = currentAccountEmail()
+        val logoutUrl = buildString {
+            append(authority).append("/oauth2/v2.0/logout")
+            if (hint.isNotBlank()) append("?logout_hint=").append(Uri.encode(hint))
+        }
+
+        // Verify this is hitting the right tenant/domain if the session still comes back after
+        // this runs - filter Logcat for tag "MSAL". Also: the sign-out only actually takes effect
+        // once this page finishes loading in the tab (that's when Entra's Set-Cookie response
+        // clearing the session arrives) - backgrounding or navigating away from the tab too soon
+        // can leave the old session intact despite the tab having opened.
+        Log.d("MSAL", "browserSignOut logoutUrl = $logoutUrl")
+
+        try {
+            CustomTabsIntent.Builder().build().launchUrl(requireContext(), Uri.parse(logoutUrl))
+        } catch (e: ActivityNotFoundException) {
+            displayDialog(getString(R.string.msal_exception_title), getString(R.string.browser_sign_out_no_browser_message))
+        }
     }
 
     // --- Booking widget state: search -> driver details -> confirmation ---

@@ -501,6 +501,22 @@
                 android:textSize="11sp"
                 android:textStyle="italic" />
 
+            <Button
+                android:id="@+id/access_sensitive_feature_native_only_button"
+                style="@style/Widget.Banana.Button.GoldOutline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_10dp"
+                android:text="@string/access_sensitive_feature_native_only_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimens_5dp"
+                android:text="@string/sensitive_feature_native_only_demo_note"
+                android:textSize="11sp"
+                android:textStyle="italic" />
+
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/token_tabs"
                 android:layout_width="match_parent"

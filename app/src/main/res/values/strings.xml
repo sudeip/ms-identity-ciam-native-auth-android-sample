@@ -18,6 +18,8 @@
     <string name="sign_up">"Sign Up"</string>
     <string name="sign_out">"Sign Out"</string>
     <string name="browser_sign_out_button">"Sign Out of Browser Session"</string>
+    <string name="browser_sign_out_no_authority_message">"Couldn\'t determine the tenant authority to build the logout URL from - check auth_config_native_auth.json is valid, or that AuthClient.initialize() was called with a valid authorityUrl."</string>
+    <string name="browser_sign_out_no_browser_message">"No app on this device can open a browser link. Sign Out of Browser Session needs a real browser (e.g. Chrome) installed to clear the SSO session - some bare emulator images don\'t ship with one."</string>
     <string name="browser_sign_out_note">"\'Sign Out\' above only clears this app\'s cache. Use this to also clear the SSO session Entra keeps in the browser, so the next browser-based sign-in (Profile tab, or the MFA step-up above) asks fresh instead of reusing it."</string>
     <string name="forget_password">"Forget Password"</string>
     <string name="submit_password">"Submit"</string>
@@ -151,6 +153,12 @@
     <string name="sensitive_data_now_visible_button">"Sensitive Data now Visible"</string>
     <string name="sensitive_feature_demo_note">"Requests an \'acrs\' Authentication Context claim on the access token. If your tenant\'s Conditional Access policy requires MFA for it, you\'ll be prompted in a browser popup to complete it."</string>
     <string name="step_up_not_satisfied_message">"Step-up completed, but the acrs claim wasn\'t satisfied - check that your Conditional Access policy is scoped to this app and the Authentication Context ID matches."</string>
+
+    <string name="access_sensitive_feature_native_only_button">"Access Sensitive Feature (Native Auth Only)"</string>
+    <string name="sensitive_feature_native_only_demo_note">"Same acrs request as above, but with no browser fallback - shows the raw error native auth returns when Conditional Access needs an interactive challenge it has no way to complete in-app."</string>
+    <string name="native_step_up_error_title">"Native Auth Cannot Complete Step-Up"</string>
+    <string name="native_step_up_requires_browser_message">"Conditional Access requires an interactive challenge (e.g. MFA) for this Authentication Context. Native auth\'s APIs have no UI to satisfy that in-app, so the request fails here - this is exactly the case the \'Require MFA\' button\'s browser fallback exists for.\n\nRaw error: %1$s"</string>
+    <string name="native_step_up_not_challenged_message">"Conditional Access didn\'t need interaction this time (already satisfied, or not configured for this account) - so there was nothing for native auth to fail on. Clear the browser session first if you want to force a fresh challenge."</string>
 
     <string name="id_token_tab">"ID Token"</string>
     <string name="access_token_tab">"Access Token"</string>
